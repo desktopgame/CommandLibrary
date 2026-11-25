@@ -1,0 +1,81 @@
+schema_version: 1
+coverage: partial
+
+sources:
+  manual:
+    url: https://docs.podman.io/en/v5.7.0/markdown/podman-restart.1.html
+    version: '5.7.0'
+  local-help:
+    fixture: fixtures/restart-help.txt
+
+types:
+  ContainerReference:
+    kind: string
+    description: Container name, full ID, or partial ID. Resolution precedence and ambiguity are uninvestigated.
+    evidence: [manual]
+  ContainerIDFile:
+    kind: string
+    description: Path to a file from which Podman reads a container ID.
+    evidence: [manual, local-help]
+  ContainerFilter:
+    kind: string
+    syntax: key=value
+    description: Condition for selecting containers. The name and id filters accept regular expressions.
+    evidence: [manual]
+  StopTimeout:
+    kind: integer
+    unit: seconds
+    special_values:
+      - value: -1
+        meaning: Wait indefinitely.
+        evidence: [manual]
+
+commands:
+  restart:
+    coverage: partial
+    behavior_verification: untested
+    alternate_paths: [[container, restart]]
+    description: Restarts running containers and starts stopped containers.
+    evidence: [manual, local-help]
+    positional:
+      - name: containers
+        accepts: [ContainerReference]
+        min_count: 0
+        max_count: unbounded
+        description: With explicit targets at least one reference is required. Selector options can supply targets without positional arguments.
+    options:
+      --all:
+        kind: flag
+        aliases: [-a]
+        description: Selects all containers according to the manual. Local help says non-running containers.
+        verification: conflicting_evidence
+        evidence: [manual, local-help]
+      --running:
+        kind: flag
+        description: Selects running containers.
+        evidence: [manual, local-help]
+      --latest:
+        kind: flag
+        aliases: [-l]
+        description: Selects the last created container in local mode.
+        evidence: [manual, local-help]
+      --cidfile:
+        kind: value
+        accepts: [ContainerIDFile]
+        repeatable: true
+        evidence: [manual, local-help]
+      --filter:
+        kind: value
+        aliases: [-f]
+        accepts: [ContainerFilter]
+        repeatable: true
+        evidence: [manual, local-help]
+      --time:
+        kind: value
+        aliases: [-t]
+        accepts: [StopTimeout]
+        default: 10
+        evidence: [manual, local-help]
+    special_values:
+      status: unknown
+    uninvestigated: [global_options, option_placement, selector_combinations, remote_behavior]

@@ -1,0 +1,44 @@
+schema_version: 1
+command: podman
+package:
+  name: podman
+  version: 5.7.0+ds2-3build1
+  architecture: amd64
+identity:
+  match: all
+  executable:
+    path: /usr/bin/podman
+    sha256: 6627da0abfd3b0189498089319f5759c7b132bb6a51130bf8ff43d7f102d9673
+  environment:
+    inherit: false
+    variables:
+      PATH: /usr/bin:/bin
+      LC_ALL: C
+      HOME: ${probe_tmpdir}
+      XDG_RUNTIME_DIR: ${probe_tmpdir}
+    probe_tmpdir:
+      kind: fresh_private_directory
+      placeholder: ${probe_tmpdir}
+  probes:
+  - argv:
+    - --version
+    exit_code: 0
+    stdout:
+      match: exact
+      fixture: fixtures/version.txt
+    stderr:
+      match: exact
+      value: ''
+  - argv:
+    - --help
+    exit_code: 0
+    stdout:
+      match: exact
+      fixture: fixtures/help.txt
+      normalize:
+      - kind: replace_literal
+        from: resolved_probe_tmpdir
+        to: ${probe_tmpdir}
+    stderr:
+      match: exact
+      value: ''

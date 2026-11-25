@@ -1,0 +1,38 @@
+schema_version: 1
+command: systemctl
+package:
+  name: systemd
+  version: 259.9-0ubuntu0.1
+  architecture: amd64
+identity:
+  match: all
+  executable:
+    path: /usr/bin/systemctl
+    sha256: 639bce3ce5c06b605079ea56f74e3f08216ddffcfa76e11f62073aa775180082
+  environment:
+    inherit: false
+    variables:
+      PATH: /usr/bin:/bin
+      LC_ALL: C
+      SYSTEMD_COLORS: '0'
+  probes:
+  - argv:
+    - --no-pager
+    - --version
+    exit_code: 0
+    stdout:
+      match: exact
+      fixture: fixtures/version.txt
+    stderr:
+      match: exact
+      value: ''
+  - argv:
+    - --no-pager
+    - --help
+    exit_code: 0
+    stdout:
+      match: exact
+      fixture: fixtures/help.txt
+    stderr:
+      match: exact
+      value: ''

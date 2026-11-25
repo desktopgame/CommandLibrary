@@ -1,0 +1,49 @@
+schema_version: 1
+coverage: partial
+
+sources:
+  manual:
+    url: https://www.freedesktop.org/software/systemd/man/259/systemctl.html
+    version: '259.6'
+  local-help:
+    fixture: fixtures/help.txt
+
+types:
+  UnitName:
+    kind: string
+    description: A literal unit name identifies one unit. An omitted suffix defaults to .service for restart.
+    evidence: [manual]
+  UnitPattern:
+    kind: string
+    syntax: glob
+    description: Matches primary unit names currently in memory. Unmatched globs are skipped.
+    evidence: [manual]
+  AbsoluteUnitPath:
+    kind: string
+    description: An absolute device or mount path converted into the corresponding unit name.
+    evidence: [manual]
+
+options:
+  --no-block:
+    kind: flag
+    description: Queue the job without waiting for it to finish.
+    evidence: [manual, local-help]
+
+commands:
+  restart:
+    coverage: partial
+    behavior_verification: untested
+    description: Stops and starts the selected units. Inactive units are started.
+    evidence: [manual, local-help]
+    positional:
+      - name: units
+        accepts: [UnitName, UnitPattern, AbsoluteUnitPath]
+        min_count: 1
+        max_count: unbounded
+    special_values:
+      status: partial
+      values:
+        '*':
+          meaning: Glob matching all primary unit names currently in memory.
+          evidence: [manual]
+    uninvestigated: [option_placement, option_interactions, unit_resolution_edge_cases]
